@@ -7,6 +7,7 @@ public class Checker {
 
     /**
      * Creates checker
+     *
      * @param c - character to create from
      */
     public Checker(char c) {
@@ -32,6 +33,7 @@ public class Checker {
 
     /**
      * String representation
+     *
      * @return string
      */
     @Override

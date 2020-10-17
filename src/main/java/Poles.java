@@ -1,3 +1,7 @@
+import game_logic_exceptions.BusyCellException;
+import game_logic_exceptions.GameLogicException;
+import game_logic_exceptions.InvalidMoveException;
+
 import java.util.*;
 
 class Poles {
@@ -161,11 +165,11 @@ class Poles {
      */
     void checkNewPole(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
         if (checkBusyCell(new_pole)) {
-            throw new GameLogicException("busy cell");
+            throw new BusyCellException("busy cell");
         }
         if (isCanCut(prev_pole, cut_poles)) {
             if (!isNormalCut(prev_pole, new_pole, cut_poles)) {
-                throw new GameLogicException("invalid move");
+                throw new InvalidMoveException("invalid move");
             } else {
                 poles.remove(Pole.hash(prev_pole));
                 poles.put(Pole.hash(new_pole), new_pole);

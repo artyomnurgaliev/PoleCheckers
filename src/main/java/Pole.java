@@ -1,3 +1,6 @@
+import game_logic_exceptions.GameLogicException;
+import game_logic_exceptions.WhiteCellException;
+
 import java.util.ArrayList;
 
 /**
@@ -10,6 +13,7 @@ public class Pole {
 
     /**
      * Creates empty pole from it position on checkerboard
+     *
      * @param x - x coordinate (x in [1 - 8])
      * @param y - y coordinate (y in [1 - 8])
      */
@@ -20,6 +24,7 @@ public class Pole {
 
     /**
      * Returns x pos on checkerboard
+     *
      * @return x (x in [1 - 8])
      */
     public int getX() {
@@ -28,6 +33,7 @@ public class Pole {
 
     /**
      * Returns y pos on checkerboard
+     *
      * @return y (y in [1 - 8])
      */
     public int getY() {
@@ -36,6 +42,7 @@ public class Pole {
 
     /**
      * Checks whether pole is empty
+     *
      * @return true if pole is empty
      */
     public boolean isEmpty() {
@@ -44,14 +51,15 @@ public class Pole {
 
     /**
      * Returns string representation of a pole
+     *
      * @return string
      */
     @Override
     public String toString() {
         int offset = 'a';
         offset += x - 1;
-        char str_x = (char)offset;
-        char str_y =  (char)(y +'0');
+        char str_x = (char) offset;
+        char str_y = (char) (y + '0');
         StringBuilder stringBuilder = new StringBuilder(35);
         stringBuilder.append(str_x);
         stringBuilder.append(str_y);
@@ -63,6 +71,7 @@ public class Pole {
 
     /**
      * Creating pole by processing input
+     *
      * @param pole_string - input
      * @throws GameLogicException (if the moves are against the rules)
      */
@@ -75,7 +84,7 @@ public class Pole {
             addChecker(new Checker(pole_string.charAt(i)));
         }
         if ((x + y) % 2 == 1) {
-            throw new GameLogicException("white cell");
+            throw new WhiteCellException("white cell");
         }
         if (x > 8 || x < 1 || y > 8 || y < 1) {
             throw new GameLogicException("error");
@@ -85,6 +94,7 @@ public class Pole {
 
     /**
      * Checks that the checkers in this pole and another match (with the check for king)
+     *
      * @param another - pole to compare with
      * @return - true if matches
      */
@@ -100,7 +110,7 @@ public class Pole {
                 return false;
             }
         }
-        if (this.isKing() == another.isKing()) {
+        if (this.isKing() && another.isKing() || !this.isKing() && !another.isKing()) {
             if (this.getColor() != another.getColor()) {
                 return false;
             }
@@ -115,6 +125,7 @@ public class Pole {
 
     /**
      * returns the last felled checker
+     *
      * @return checker
      * @throws GameLogicException (if the moves are against the rules)
      */
@@ -127,6 +138,7 @@ public class Pole {
 
     /**
      * Add new checker in pole
+     *
      * @param checker - checker to be added
      */
     public void addChecker(Checker checker) {
@@ -135,6 +147,7 @@ public class Pole {
 
     /**
      * Returns color of the top checker in pole
+     *
      * @return checker
      */
     public Color getColor() {
@@ -143,6 +156,7 @@ public class Pole {
 
     /**
      * Returns whether the top checker in King
+     *
      * @return true if king
      */
     public boolean isKing() {
@@ -151,6 +165,7 @@ public class Pole {
 
     /**
      * Checks whether poles are on the same diagonal on checkerboard
+     *
      * @param another - pole to check with
      * @return true if on the same diagonal
      */
@@ -160,6 +175,7 @@ public class Pole {
 
     /**
      * Returns diagonal distance for poles on the same diagonal
+     *
      * @param another - pole to find distance to
      * @return int distance
      */
@@ -176,7 +192,7 @@ public class Pole {
     }
 
     /**
-     *  Calculates hash of direction to another pole
+     * Calculates hash of direction to another pole
      */
     int direction_hash(Pole another) {
         if (another.x > x && another.y > y) return hash(new Pole(1, 1));
@@ -190,10 +206,11 @@ public class Pole {
 
     /**
      * Calculates hash for pole position
+     *
      * @param pole - pole to calc hash for
      * @return integer x + y * 10
      */
-   static int hash(Pole pole) {
+    static int hash(Pole pole) {
         return pole.getX() + pole.getY() * 10;
     }
 }

@@ -1,3 +1,5 @@
+import game_logic_exceptions.GameLogicException;
+
 import java.util.StringTokenizer;
 
 public class CheckerBoard {
