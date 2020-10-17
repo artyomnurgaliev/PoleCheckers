@@ -1,4 +1,4 @@
-import sun.jvm.hotspot.code.Location;
+import java.util.Objects;
 
 public class Checker {
 
@@ -31,8 +31,37 @@ public class Checker {
         return isKing;
     }
 
+    @Override
+    public String toString() {
+        if (color == Color.WHITE) {
+            if (isKing())
+                return "W";
+            else
+                return "w";
+        } else {
+            if (isKing())
+                return "B";
+            else
+                return "b";
+        }
+    }
+
     public void setKing(boolean king) {
         isKing = king;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Checker checker = (Checker) o;
+        return isKing == checker.isKing &&
+                color == checker.color;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color, isKing);
     }
 }
 

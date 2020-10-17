@@ -11,8 +11,10 @@ public class Main {
         CheckerBoard checkerBoard = new CheckerBoard(white_poles, black_poles);
         String line;
         while ((line = br.readLine()) != null) {
+            if ("".equals(line)) break;
             checkerBoard.move(line);
         }
+        checkerBoard.printResult();
     }
 
 

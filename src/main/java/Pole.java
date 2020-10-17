@@ -1,18 +1,62 @@
 import java.util.ArrayList;
 
+/**
+ * Pole of checkers
+ */
 public class Pole {
     private ArrayList<Checker> checkers = new ArrayList<>();
     private int x;
     private int y;
 
+    Pole(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * Returns x pos on checkerboard
+     * @return x (x in [1 - 8])
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Returns y pos on checkerboard
+     * @return y (y in [1 - 8])
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * Checks whether pole is empty
+     * @return true if pole is empty
+     */
+    public boolean isEmpty() {
+        return checkers.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        int offset = 'a';
+        offset += x - 1;
+        char str_x = (char)offset;
+        char str_y =  (char)(y +'0');
+        StringBuilder stringBuilder = new StringBuilder(35);
+        stringBuilder.append(str_x);
+        stringBuilder.append(str_y);
+        stringBuilder.append("_");
+        for (Checker checker : checkers)
+            stringBuilder.append(checker.toString());
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Creating pole by processing input
+     * @param pole_string - input
+     * @throws GameLogicException
+     */
     public Pole(String pole_string) throws GameLogicException {
         int x_coord = pole_string.charAt(0);
         int offset = 'a';
@@ -30,7 +74,12 @@ public class Pole {
 
     }
 
-    public boolean isSameCheckers(Pole another) {
+    /**
+     * Checks that the checkers in this pole and another match (with the check for king)
+     * @param another - pole to compare with
+     * @return - true if matches
+     */
+    public boolean isSameKindCheckers(Pole another) {
         if (checkers.size() != another.checkers.size()) {
             return false;
         }
@@ -42,6 +91,11 @@ public class Pole {
                 return false;
             }
         }
+        if (this.isKing() == another.isKing()) {
+            if (this.getColor() != another.getColor()) {
+                return false;
+            }
+        }
         for (int i = 1; i < checkers.size(); ++i) {
             if (!checkers.get(i).equals(another.checkers.get(i))) {
                 return false;
@@ -50,6 +104,11 @@ public class Pole {
         return true;
     }
 
+    /**
+     * returns the last felled checker
+     * @return checker
+     * @throws GameLogicException
+     */
     public Checker getLastCutChecker() throws GameLogicException {
         if (checkers.isEmpty()) {
             throw new GameLogicException("error");
@@ -57,41 +116,70 @@ public class Pole {
         return checkers.get(checkers.size() - 1);
     }
 
+    /**
+     * Add new checker in pole
+     * @param checker - checker to be added
+     */
     public void addChecker(Checker checker) {
         checkers.add(checker);
     }
+
+    /**
+     * Returns color of the top checker in pole
+     * @return checker
+     */
     public Color getColor() {
         return checkers.get(0).getColor();
     }
 
+    /**
+     * Returns whether the top checker in King
+     * @return true if king
+     */
     public boolean isKing() {
         return checkers.get(0).isKing();
     }
 
+    /**
+     * Checks whether poles are on the same diagonal on checkerboard
+     * @param another - pole to check with
+     * @return true if on the same diagonal
+     */
     public boolean isOnSameDiagonal(Pole another) {
         return Math.abs(x - another.x) == Math.abs(y - another.y);
     }
 
+    /**
+     * Returns diagonal distance for poles on the same diagonal
+     * @param another - pole to find distance to
+     * @return int distance
+     */
     public int getDistance(Pole another) {
         return Math.abs(x - another.x);
     }
 
+    /**
+     * Removes top checker from pole
+     * (use it if pole is cut)
+     */
     public void removeChecker() {
         checkers.remove(0);
     }
 
-    public int direction_hash(Pole another) {
-        if (another.x > x && another.y > y) return 11;
-        if (another.x < x && another.y > y) return -9;
-        if (another.x > x && another.y < y) return 9;
-        if (another.x < x && another.y < y) return -11;
+    // Calculates hash of
+    int direction_hash(Pole another) {
+        if (another.x > x && another.y > y) return hash(new Pole(1, 1));
+        if (another.x < x && another.y > y) return hash(new Pole(-1, 1));
+        if (another.x > x && another.y < y) return hash(new Pole(1, -1));
+        if (another.x < x && another.y < y) return hash(new Pole(-1, -1));
 
         // Unreachable
         return 0;
     }
 
-    public static int hash(Pole pole) {
-        return pole.getX() * 10 + pole.getY();
+   // Calculates hash for pole position
+   static int hash(Pole pole) {
+        return pole.getX() + pole.getY() * 10;
     }
 }
 

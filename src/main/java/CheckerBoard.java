@@ -1,7 +1,7 @@
 import java.util.StringTokenizer;
 
 public class CheckerBoard {
-    Poles poles = new Poles();
+    private Poles poles = new Poles();
 
     public CheckerBoard(String white_poles, String black_poles) throws GameLogicException {
         StringTokenizer st = new StringTokenizer(white_poles, " ");
@@ -12,6 +12,10 @@ public class CheckerBoard {
         while (st.hasMoreTokens()) {
             this.poles.addPole(st.nextToken());
         }
+    }
+
+    public void printResult() {
+        poles.printResult();
     }
 
     public void move(String moves) throws GameLogicException {
