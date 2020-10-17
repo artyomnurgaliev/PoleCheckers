@@ -1,8 +1,15 @@
 import java.util.StringTokenizer;
 
 public class CheckerBoard {
-    private Poles poles = new Poles();
+    // Storage of poles on checkerboard
+    private final Poles poles = new Poles();
 
+    /**
+     * Create checkerboard from two input strings
+     * @param white_poles - string representation of white poles
+     * @param black_poles - string representation of black poles
+     * @throws GameLogicException (if something against the rules)
+     */
     public CheckerBoard(String white_poles, String black_poles) throws GameLogicException {
         StringTokenizer st = new StringTokenizer(white_poles, " ");
         while (st.hasMoreTokens()) {
@@ -14,10 +21,18 @@ public class CheckerBoard {
         }
     }
 
-    public void printResult() {
-        poles.printResult();
+    /**
+     * Prints final position of checkerboard
+     */
+    public void printFinalPosition() {
+        poles.printPoles();
     }
 
+    /**
+     * Process moves
+     * @param moves - moves of one turn (one white and one black)
+     * @throws GameLogicException (if the moves are against the rules)
+     */
     public void move(String moves) throws GameLogicException {
         StringTokenizer st = new StringTokenizer(moves, " ");
         String white_moves = st.nextToken();

@@ -4,10 +4,15 @@ import java.util.ArrayList;
  * Pole of checkers
  */
 public class Pole {
-    private ArrayList<Checker> checkers = new ArrayList<>();
-    private int x;
-    private int y;
+    private final ArrayList<Checker> checkers = new ArrayList<>();
+    private final int x;
+    private final int y;
 
+    /**
+     * Creates empty pole from it position on checkerboard
+     * @param x - x coordinate (x in [1 - 8])
+     * @param y - y coordinate (y in [1 - 8])
+     */
     Pole(int x, int y) {
         this.x = x;
         this.y = y;
@@ -37,6 +42,10 @@ public class Pole {
         return checkers.isEmpty();
     }
 
+    /**
+     * Returns string representation of a pole
+     * @return string
+     */
     @Override
     public String toString() {
         int offset = 'a';
@@ -55,7 +64,7 @@ public class Pole {
     /**
      * Creating pole by processing input
      * @param pole_string - input
-     * @throws GameLogicException
+     * @throws GameLogicException (if the moves are against the rules)
      */
     public Pole(String pole_string) throws GameLogicException {
         int x_coord = pole_string.charAt(0);
@@ -107,7 +116,7 @@ public class Pole {
     /**
      * returns the last felled checker
      * @return checker
-     * @throws GameLogicException
+     * @throws GameLogicException (if the moves are against the rules)
      */
     public Checker getLastCutChecker() throws GameLogicException {
         if (checkers.isEmpty()) {
@@ -166,7 +175,9 @@ public class Pole {
         checkers.remove(0);
     }
 
-    // Calculates hash of
+    /**
+     *  Calculates hash of direction to another pole
+     */
     int direction_hash(Pole another) {
         if (another.x > x && another.y > y) return hash(new Pole(1, 1));
         if (another.x < x && another.y > y) return hash(new Pole(-1, 1));
@@ -177,7 +188,11 @@ public class Pole {
         return 0;
     }
 
-   // Calculates hash for pole position
+    /**
+     * Calculates hash for pole position
+     * @param pole - pole to calc hash for
+     * @return integer x + y * 10
+     */
    static int hash(Pole pole) {
         return pole.getX() + pole.getY() * 10;
     }

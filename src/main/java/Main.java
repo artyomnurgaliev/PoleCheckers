@@ -3,6 +3,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
+    /**
+     * Play pole checkers game
+     * @throws IOException (if something wrong with input)
+     * @throws GameLogicException (if something wrong with game logic)
+     */
     public static void game() throws IOException, GameLogicException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String white_poles = br.readLine();
@@ -14,7 +19,7 @@ public class Main {
             if ("".equals(line)) break;
             checkerBoard.move(line);
         }
-        checkerBoard.printResult();
+        checkerBoard.printFinalPosition();
     }
 
 

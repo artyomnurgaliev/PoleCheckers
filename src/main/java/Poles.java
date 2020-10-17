@@ -1,12 +1,16 @@
 import java.util.*;
 
 class Poles {
-    private HashMap<Integer, Pole> poles = new HashMap<>();
+    // Storage of poles with hash calculated from its positions
+    private final HashMap<Integer, Pole> poles = new HashMap<>();
 
-    public void printResult() {
-        SortedSet<Integer> keys = new TreeSet<Integer>(poles.keySet());
+    /**
+     * Print representation of poles
+     */
+    public void printPoles() {
+        SortedSet<Integer> keys = new TreeSet<>(poles.keySet());
         StringBuilder stringBuilder = new StringBuilder(1000);
-        for (int key: keys) {
+        for (int key : keys) {
             if (poles.get(key).getColor() == Color.WHITE) {
                 stringBuilder.append(poles.get(key).toString());
                 stringBuilder.append(" ");
@@ -14,7 +18,7 @@ class Poles {
         }
         System.out.println(stringBuilder.toString());
         stringBuilder = new StringBuilder(1000);
-        for (int key: keys) {
+        for (int key : keys) {
             if (poles.get(key).getColor() == Color.BLACK) {
                 stringBuilder.append(poles.get(key).toString());
                 stringBuilder.append(" ");
@@ -23,24 +27,45 @@ class Poles {
         System.out.println(stringBuilder.toString());
     }
 
+    /**
+     * Adds new pole on checkerboard
+     * @param pole_str - string representation of a pole
+     * @throws GameLogicException (if smth against the rules)
+     */
     public void addPole(String pole_str) throws GameLogicException {
         Pole pole = new Pole(pole_str);
         poles.put(Pole.hash(pole), pole);
     }
 
+    /**
+     * Check whether position of a pole on checkerboard is not empty
+     * @param new_pole - pole under consideration
+     * @return true if not empty
+     */
     public boolean checkBusyCell(Pole new_pole) {
         return poles.containsKey(Pole.hash(new_pole));
     }
 
-    public boolean checkBusyCell(int hash) {
+    /**
+     * Check whether this position on checkerboard is not empty
+     * @param hash - hash of a position on checkerboard (hash: x + 10 * y)
+     * @return true if not empty
+     */
+    boolean checkBusyCell(int hash) {
         return poles.containsKey(hash);
     }
 
-    public boolean IsCanCut(Pole prev_pole, HashSet<Integer> cut_poles) {
+    /**
+     * Checks whether pole can cut another pole from this position
+     * @param prev_pole - pole under consideration
+     * @param cut_poles- poles cut during previous moves on this stage
+     * @return true if can cut
+     */
+    public boolean isCanCut(Pole prev_pole, HashSet<Integer> cut_poles) {
         int lower_left_hash = Pole.hash(new Pole(-1, -1));
         int upper_left_hash = Pole.hash(new Pole(-1, 1));
         int lower_right_hash = Pole.hash(new Pole(1, -1));
-        int upper_right_hash = Pole.hash(new Pole(1, 1));;
+        int upper_right_hash = Pole.hash(new Pole(1, 1));
         int max_distance = 1;
         if (prev_pole.isKing()) {
             max_distance = 7;
@@ -69,6 +94,15 @@ class Poles {
         return false;
     }
 
+    /**
+     * Check whether cut of pole is in accordance with rules
+     *
+     * @param prev_pole - pole on previous position
+     * @param new_pole  - pole on new position
+     * @param cut_poles - poles cut during previous moves on this stage
+     * @return true if cut is correct
+     * @throws GameLogicException (if the moves are against the rules)
+     */
     public boolean isNormalCut(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
         if (new_pole.getLastCutChecker().getColor() != new_pole.getColor()) {
             prev_pole.addChecker(new_pole.getLastCutChecker());
@@ -117,11 +151,19 @@ class Poles {
         return false;
     }
 
-    public void checkNewPole(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
+    /**
+     * Checking if move is possible
+     *
+     * @param prev_pole - pole on previous position
+     * @param new_pole  - pole on new position
+     * @param cut_poles - poles, cut during previous moves on this stage
+     * @throws GameLogicException (if the moves are against the rules)
+     */
+    void checkNewPole(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
         if (checkBusyCell(new_pole)) {
             throw new GameLogicException("busy cell");
         }
-        if (IsCanCut(prev_pole, cut_poles)) {
+        if (isCanCut(prev_pole, cut_poles)) {
             if (!isNormalCut(prev_pole, new_pole, cut_poles)) {
                 throw new GameLogicException("invalid move");
             } else {
@@ -148,6 +190,12 @@ class Poles {
         }
     }
 
+    /**
+     * Perform one player's turn
+     *
+     * @param moves - moves in one player turn
+     * @throws GameLogicException (if the moves are against the rules)
+     */
     public void move(String moves) throws GameLogicException {
         StringTokenizer st = new StringTokenizer(moves, ":");
         if (st.countTokens() == 1) {

@@ -5,11 +5,10 @@ public class Checker {
     private Color color;
     private boolean isKing;
 
-    public Checker(Color color, boolean isKing) {
-        this.color = color;
-        this.isKing = isKing;
-    }
-
+    /**
+     * Creates checker
+     * @param c - character to create from
+     */
     public Checker(char c) {
         if (c == 'w' || c == 'W') {
             color = Color.WHITE;
@@ -31,6 +30,10 @@ public class Checker {
         return isKing;
     }
 
+    /**
+     * String representation
+     * @return string
+     */
     @Override
     public String toString() {
         if (color == Color.WHITE) {
@@ -44,10 +47,6 @@ public class Checker {
             else
                 return "b";
         }
-    }
-
-    public void setKing(boolean king) {
-        isKing = king;
     }
 
     @Override
@@ -65,6 +64,9 @@ public class Checker {
     }
 }
 
+/**
+ * Colors of checker
+ */
 enum Color {
     BLACK,
     WHITE
