@@ -5,36 +5,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CheckerTest {
+    Checker checker;
 
     @BeforeEach
     void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
+        checker = new Checker('w');
     }
 
     @Test
     void getColor() {
-    }
-
-    @Test
-    void setColor() {
+        assertEquals(checker.getColor(), Color.WHITE);
     }
 
     @Test
     void isKing() {
+        assertFalse(checker.isKing());
     }
 
     @Test
     void testToString() {
-    }
-
-    @Test
-    void testEquals() {
-    }
-
-    @Test
-    void testHashCode() {
+        assertEquals("w", checker.toString());
     }
 }

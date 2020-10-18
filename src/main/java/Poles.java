@@ -9,6 +9,15 @@ class Poles {
     private final HashMap<Integer, Pole> poles = new HashMap<>();
 
     /**
+     * Returns hashmap of poles
+     *
+     * @return poles
+     */
+    HashMap<Integer, Pole> getPoles() {
+        return poles;
+    }
+
+    /**
      * Print representation of poles
      */
     public void printPoles() {
@@ -33,25 +42,28 @@ class Poles {
 
     /**
      * Adds new pole on checkerboard
+     *
      * @param pole_str - string representation of a pole
      * @throws GameLogicException (if smth against the rules)
      */
     public void addPole(String pole_str) throws GameLogicException {
         Pole pole = new Pole(pole_str);
-        poles.put(Pole.hash(pole), pole);
+        poles.put(Pole.pos(pole), pole);
     }
 
     /**
      * Check whether position of a pole on checkerboard is not empty
+     *
      * @param new_pole - pole under consideration
      * @return true if not empty
      */
     public boolean checkBusyCell(Pole new_pole) {
-        return poles.containsKey(Pole.hash(new_pole));
+        return poles.containsKey(Pole.pos(new_pole));
     }
 
     /**
      * Check whether this position on checkerboard is not empty
+     *
      * @param hash - hash of a position on checkerboard (hash: x + 10 * y)
      * @return true if not empty
      */
@@ -61,15 +73,16 @@ class Poles {
 
     /**
      * Checks whether pole can cut another pole from this position
-     * @param prev_pole - pole under consideration
+     *
+     * @param prev_pole  - pole under consideration
      * @param cut_poles- poles cut during previous moves on this stage
      * @return true if can cut
      */
     public boolean isCanCut(Pole prev_pole, HashSet<Integer> cut_poles) {
-        int lower_left_hash = Pole.hash(new Pole(-1, -1));
-        int upper_left_hash = Pole.hash(new Pole(-1, 1));
-        int lower_right_hash = Pole.hash(new Pole(1, -1));
-        int upper_right_hash = Pole.hash(new Pole(1, 1));
+        int lower_left_hash = Pole.pos(new Pole(-1, -1));
+        int upper_left_hash = Pole.pos(new Pole(-1, 1));
+        int lower_right_hash = Pole.pos(new Pole(1, -1));
+        int upper_right_hash = Pole.pos(new Pole(1, 1));
         int max_distance = 1;
         if (prev_pole.isKing()) {
             max_distance = 7;
@@ -77,7 +90,7 @@ class Poles {
         int[] directions = {lower_left_hash, upper_left_hash, lower_right_hash, upper_right_hash};
         for (int move : directions) {
             for (int i = 1; i <= max_distance; ++i) {
-                int cur_hash = Pole.hash(prev_pole) + move * i;
+                int cur_hash = Pole.pos(prev_pole) + move * i;
                 if (poles.containsKey(cur_hash)) {
                     if (poles.get(cur_hash).getColor() == prev_pole.getColor()) {
                         break;
@@ -100,6 +113,7 @@ class Poles {
 
     /**
      * Check whether cut of pole is in accordance with rules
+     * If cut is normal remove top checker from cut pole
      *
      * @param prev_pole - pole on previous position
      * @param new_pole  - pole on new position
@@ -107,12 +121,12 @@ class Poles {
      * @return true if cut is correct
      * @throws GameLogicException (if the moves are against the rules)
      */
-    public boolean isNormalCut(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
+    public boolean normalCut(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
         if (new_pole.getLastCutChecker().getColor() != new_pole.getColor()) {
             prev_pole.addChecker(new_pole.getLastCutChecker());
             if (new_pole.isSameKindCheckers(prev_pole)) {
                 if (new_pole.isOnSameDiagonal(prev_pole)) {
-                    int direction = prev_pole.direction_hash(new_pole);
+                    int direction = prev_pole.direction(new_pole);
 
                     // Calc max distance depending on isKing
                     int max_distance = 1;
@@ -120,7 +134,7 @@ class Poles {
                         max_distance = 7;
                     }
                     for (int i = 1; i <= max_distance; ++i) {
-                        int cur_hash = Pole.hash(prev_pole) + direction * i;
+                        int cur_hash = Pole.pos(prev_pole) + direction * i;
                         if (poles.containsKey(cur_hash)) {
                             // Check that cut pole color is not the same as new pole color
                             if (poles.get(cur_hash).getColor() == prev_pole.getColor()) {
@@ -157,22 +171,23 @@ class Poles {
 
     /**
      * Checking if move is possible
+     * if possible, then process move
      *
      * @param prev_pole - pole on previous position
      * @param new_pole  - pole on new position
      * @param cut_poles - poles, cut during previous moves on this stage
      * @throws GameLogicException (if the moves are against the rules)
      */
-    void checkNewPole(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
+    void checkNewPoleAndDoMove(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
         if (checkBusyCell(new_pole)) {
             throw new BusyCellException("busy cell");
         }
         if (isCanCut(prev_pole, cut_poles)) {
-            if (!isNormalCut(prev_pole, new_pole, cut_poles)) {
+            if (!normalCut(prev_pole, new_pole, cut_poles)) {
                 throw new InvalidMoveException("invalid move");
             } else {
-                poles.remove(Pole.hash(prev_pole));
-                poles.put(Pole.hash(new_pole), new_pole);
+                poles.remove(Pole.pos(prev_pole));
+                poles.put(Pole.pos(new_pole), new_pole);
             }
         } else {
             if (!new_pole.isSameKindCheckers(prev_pole)) {
@@ -188,8 +203,8 @@ class Poles {
             if (new_pole.getDistance(prev_pole) > max_distance) {
                 throw new GameLogicException("error");
             } else {
-                poles.remove(Pole.hash(prev_pole));
-                poles.put(Pole.hash(new_pole), new_pole);
+                poles.remove(Pole.pos(prev_pole));
+                poles.put(Pole.pos(new_pole), new_pole);
             }
         }
     }
@@ -210,7 +225,7 @@ class Poles {
         Pole prev_pole = new Pole(st.nextToken());
         while (st.hasMoreTokens()) {
             Pole new_pole = new Pole(st.nextToken());
-            checkNewPole(prev_pole, new_pole, cut_poles);
+            checkNewPoleAndDoMove(prev_pole, new_pole, cut_poles);
             prev_pole = new_pole;
         }
     }

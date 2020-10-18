@@ -16,6 +16,7 @@ class CheckerBoardTest {
 
     @Test
     void printFinalPosition() {
+
     }
 
     @Test

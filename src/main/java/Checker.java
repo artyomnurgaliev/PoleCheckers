@@ -2,8 +2,8 @@ import java.util.Objects;
 
 public class Checker {
 
-    private Color color;
-    private boolean isKing;
+    private final Color color;
+    private final boolean isKing;
 
     /**
      * Creates checker
@@ -21,10 +21,6 @@ public class Checker {
 
     public Color getColor() {
         return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     public boolean isKing() {

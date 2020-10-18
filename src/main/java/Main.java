@@ -26,7 +26,7 @@ public class Main {
     }
 
 
-    public static void main(String[] args) throws IOException, GameLogicException {
+    public static void main(String[] args) throws IOException {
         try {
             game();
         } catch (GameLogicException e) {

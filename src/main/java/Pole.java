@@ -194,11 +194,11 @@ public class Pole {
     /**
      * Calculates hash of direction to another pole
      */
-    int direction_hash(Pole another) {
-        if (another.x > x && another.y > y) return hash(new Pole(1, 1));
-        if (another.x < x && another.y > y) return hash(new Pole(-1, 1));
-        if (another.x > x && another.y < y) return hash(new Pole(1, -1));
-        if (another.x < x && another.y < y) return hash(new Pole(-1, -1));
+    int direction(Pole another) {
+        if (another.x > x && another.y > y) return pos(new Pole(1, 1));
+        if (another.x < x && another.y > y) return pos(new Pole(-1, 1));
+        if (another.x > x && another.y < y) return pos(new Pole(1, -1));
+        if (another.x < x && another.y < y) return pos(new Pole(-1, -1));
 
         // Unreachable
         return 0;
@@ -210,7 +210,7 @@ public class Pole {
      * @param pole - pole to calc hash for
      * @return integer x + y * 10
      */
-    static int hash(Pole pole) {
+    static int pos(Pole pole) {
         return pole.getX() + pole.getY() * 10;
     }
 }
