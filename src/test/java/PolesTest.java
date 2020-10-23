@@ -1,5 +1,4 @@
 import game_logic_exceptions.GameLogicException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -125,6 +124,7 @@ class PolesTest {
             poles = new Poles();
             Pole pole3 = new Pole("a1_w");
             Pole pole4 = new Pole("b2_w");
+            poles.addPole("a1_w");
             poles.addPole("b2_w");
             Exception exception = assertThrows(GameLogicException.class, () ->
                     poles.checkNewPoleAndDoMove(pole3, pole4, new HashSet<>()));

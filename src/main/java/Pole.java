@@ -12,6 +12,34 @@ public class Pole {
     private final int y;
 
     /**
+     * Creating pole by processing input
+     *
+     * @param pole_string - input
+     * @throws GameLogicException (if the moves are against the rules)
+     */
+    public Pole(String pole_string) throws GameLogicException {
+        int x1;
+        int x_coord = pole_string.charAt(0);
+        int offset = 'a';
+        int upper_offset = 'A';
+        x1 = x_coord - offset + 1;
+        if (x1 > 8 || x1 < 1)
+            x1 = x_coord - upper_offset + 1;
+        this.x = x1;
+        this.y = Character.getNumericValue(pole_string.charAt(1));
+        for (int i = 3; i < pole_string.length(); ++i) {
+            addChecker(new Checker(pole_string.charAt(i)));
+        }
+        if ((x + y) % 2 == 1) {
+            throw new WhiteCellException("white cell");
+        }
+        if (x > 8 || x < 1 || y > 8 || y < 1) {
+            throw new GameLogicException("error");
+        }
+
+    }
+
+    /**
      * Creates empty pole from it position on checkerboard
      *
      * @param x - x coordinate (x in [1 - 8])
@@ -20,6 +48,13 @@ public class Pole {
     Pole(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    /**
+     * Mark upper checker as a king
+     */
+    public void setKing() {
+        checkers.get(0).setKing(true);
     }
 
     /**
@@ -67,29 +102,6 @@ public class Pole {
         for (Checker checker : checkers)
             stringBuilder.append(checker.toString());
         return stringBuilder.toString();
-    }
-
-    /**
-     * Creating pole by processing input
-     *
-     * @param pole_string - input
-     * @throws GameLogicException (if the moves are against the rules)
-     */
-    public Pole(String pole_string) throws GameLogicException {
-        int x_coord = pole_string.charAt(0);
-        int offset = 'a';
-        this.x = x_coord - offset + 1;
-        this.y = Character.getNumericValue(pole_string.charAt(1));
-        for (int i = 3; i < pole_string.length(); ++i) {
-            addChecker(new Checker(pole_string.charAt(i)));
-        }
-        if ((x + y) % 2 == 1) {
-            throw new WhiteCellException("white cell");
-        }
-        if (x > 8 || x < 1 || y > 8 || y < 1) {
-            throw new GameLogicException("error");
-        }
-
     }
 
     /**
@@ -211,7 +223,22 @@ public class Pole {
      * @return integer x + y * 10
      */
     static int pos(Pole pole) {
-        return pole.getX() + pole.getY() * 10;
+        return pole.getX() * 10 + pole.getY();
+    }
+
+    /**
+     * Check if pos is correct
+     *
+     * @param pos - pos of pole
+     * @return true if correct
+     */
+    static boolean checkCorrectPos(int pos) {
+        int x = pos / 10;
+        int y = pos % 10;
+        if ((x + y) % 2 == 1) {
+            return false;
+        }
+        return x <= 8 && x >= 1 && y <= 8 && y >= 1;
     }
 }
 

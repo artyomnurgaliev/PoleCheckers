@@ -4,7 +4,7 @@ import game_logic_exceptions.InvalidMoveException;
 
 import java.util.*;
 
-class Poles {
+public class Poles {
     // Storage of poles with hash calculated from its positions
     private final HashMap<Integer, Pole> poles = new HashMap<>();
 
@@ -57,18 +57,37 @@ class Poles {
      * @param new_pole - pole under consideration
      * @return true if not empty
      */
-    public boolean checkBusyCell(Pole new_pole) {
-        return poles.containsKey(Pole.pos(new_pole));
+    boolean checkBusyCell(Pole new_pole) {
+        return checkBusyCell(Pole.pos(new_pole));
     }
 
     /**
      * Check whether this position on checkerboard is not empty
      *
-     * @param hash - hash of a position on checkerboard (hash: x + 10 * y)
+     * @param pos - pos of a position on checkerboard (pos: x + 10 * y)
      * @return true if not empty
      */
-    boolean checkBusyCell(int hash) {
-        return poles.containsKey(hash);
+    boolean checkBusyCell(int pos) {
+        if (!Pole.checkCorrectPos(pos)) {
+            return true;
+        }
+        return poles.containsKey(pos);
+    }
+
+    /**
+     * Check whether some pole of this color can cut
+     *
+     * @param color - color
+     * @param cut_poles - hash set of cut poles
+     * @return true if can cut
+     */
+    boolean isCanCut(Color color, HashSet<Integer> cut_poles) {
+        for (int key : poles.keySet()) {
+            if (poles.get(key).getColor() == color && isCanCut(poles.get(key), cut_poles)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -78,7 +97,7 @@ class Poles {
      * @param cut_poles- poles cut during previous moves on this stage
      * @return true if can cut
      */
-    public boolean isCanCut(Pole prev_pole, HashSet<Integer> cut_poles) {
+    boolean isCanCut(Pole prev_pole, HashSet<Integer> cut_poles) {
         int lower_left_hash = Pole.pos(new Pole(-1, -1));
         int upper_left_hash = Pole.pos(new Pole(-1, 1));
         int lower_right_hash = Pole.pos(new Pole(1, -1));
@@ -121,7 +140,7 @@ class Poles {
      * @return true if cut is correct
      * @throws GameLogicException (if the moves are against the rules)
      */
-    public boolean normalCut(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
+    boolean normalCut(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
         if (new_pole.getLastCutChecker().getColor() != new_pole.getColor()) {
             prev_pole.addChecker(new_pole.getLastCutChecker());
             if (new_pole.isSameKindCheckers(prev_pole)) {
@@ -130,7 +149,7 @@ class Poles {
 
                     // Calc max distance depending on isKing
                     int max_distance = 1;
-                    if (new_pole.isKing()) {
+                    if (prev_pole.isKing()) {
                         max_distance = 7;
                     }
                     for (int i = 1; i <= max_distance; ++i) {
@@ -169,25 +188,45 @@ class Poles {
         return false;
     }
 
+    void SetKing(Pole new_pole, Pole prev_pole) {
+        if (new_pole.getColor() == Color.WHITE && new_pole.getY() == 8) {
+            new_pole.setKing();
+        }
+        if (new_pole.getColor() == Color.BLACK && new_pole.getY() == 1) {
+            new_pole.setKing();
+        }
+        if (prev_pole.isKing()) {
+            new_pole.setKing();
+        }
+    }
+
     /**
      * Checking if move is possible
      * if possible, then process move
+     * Check if new_pole can cut
      *
      * @param prev_pole - pole on previous position
      * @param new_pole  - pole on new position
      * @param cut_poles - poles, cut during previous moves on this stage
+     * @return true if new_pole can cut
      * @throws GameLogicException (if the moves are against the rules)
      */
-    void checkNewPoleAndDoMove(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
+    boolean checkNewPoleAndDoMove(Pole prev_pole, Pole new_pole, HashSet<Integer> cut_poles) throws GameLogicException {
+        if (!poles.containsKey(Pole.pos(prev_pole))) {
+             throw new GameLogicException("error");
+        }
+        prev_pole = poles.get(Pole.pos(prev_pole));
+        SetKing(new_pole, prev_pole);
         if (checkBusyCell(new_pole)) {
             throw new BusyCellException("busy cell");
         }
-        if (isCanCut(prev_pole, cut_poles)) {
+        if (isCanCut(prev_pole.getColor(), cut_poles)) {
             if (!normalCut(prev_pole, new_pole, cut_poles)) {
                 throw new InvalidMoveException("invalid move");
             } else {
                 poles.remove(Pole.pos(prev_pole));
                 poles.put(Pole.pos(new_pole), new_pole);
+                return isCanCut(new_pole, cut_poles);
             }
         } else {
             if (!new_pole.isSameKindCheckers(prev_pole)) {
@@ -207,6 +246,7 @@ class Poles {
                 poles.put(Pole.pos(new_pole), new_pole);
             }
         }
+        return false;
     }
 
     /**
@@ -225,7 +265,9 @@ class Poles {
         Pole prev_pole = new Pole(st.nextToken());
         while (st.hasMoreTokens()) {
             Pole new_pole = new Pole(st.nextToken());
-            checkNewPoleAndDoMove(prev_pole, new_pole, cut_poles);
+            if (checkNewPoleAndDoMove(prev_pole, new_pole, cut_poles) && (!st.hasMoreTokens())) {
+                throw new InvalidMoveException("invalid move");
+            }
             prev_pole = new_pole;
         }
     }

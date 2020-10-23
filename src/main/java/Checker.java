@@ -3,7 +3,12 @@ import java.util.Objects;
 public class Checker {
 
     private final Color color;
-    private final boolean isKing;
+
+    public void setKing(boolean king) {
+        isKing = king;
+    }
+
+    private boolean isKing;
 
     /**
      * Creates checker
